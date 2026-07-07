@@ -1,0 +1,12 @@
+.env
+payload.md
+bundle.md
+__pycache__/
+*.pyc
+node_modules/
+.venv/
+venv/
+artifacts/log.txt
+artifacts/error.md
+artifacts/test_out.txt
+artifacts/partial.json
