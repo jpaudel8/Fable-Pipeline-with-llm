@@ -1,11 +1,11 @@
 {
  "phase": "build",
- "session_next": 4,
+ "session_next": 5,
  "sessions_total": 8,
  "fixing": false,
  "pending_need": [],
  "resume": null,
- "last_note": "",
+ "last_note": "session 4 done: frontend/src/api.js, frontend/src/components/Sidebar.jsx implemented per interfaces.\nlistModels/listConversations/createConversation/listMessages are thin fetch wrappers, no error handling beyond default fetch/json rejection (not specified in contract).\nstreamMessage buffers on '\\n\\n', reads only the first 'data: ' line per event block, tolerates malformed JSON by skipping that event (not specified in contract - smallest reasonable choice, flagging in case a later session expects different malformed-event behavior).\ncontract: SSE event JSON keys used are delta (string), done (bool), message (object), error (string) - independent checks, not mutually exclusive, matching TASK wording exactly.\nno changes made to backend/db.js or backend/groq.js; both untouched this session.",
  "history": [
   {
    "s": 1,
@@ -28,6 +28,15 @@
    "utc": "2026-07-07T07:24:03",
    "files": [
     "backend/groq.js"
+   ],
+   "del": []
+  },
+  {
+   "s": 4,
+   "utc": "2026-07-07T07:26:12",
+   "files": [
+    "frontend/src/api.js",
+    "frontend/src/components/Sidebar.jsx"
    ],
    "del": []
   }

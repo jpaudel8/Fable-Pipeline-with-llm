@@ -5,6 +5,8 @@ README.md (211 lines, 11218 B)
 seed.md (145 lines, 7175 B)
 backend/db.js (91 lines, 2547 B)
 backend/groq.js (61 lines, 1884 B)
+frontend/src/api.js (66 lines, 1941 B)
+frontend/src/components/Sidebar.jsx (28 lines, 950 B)
 
 ## interfaces
 ### backend/db.js
@@ -16,3 +18,11 @@ export function getConversation(id)
 export function listMessages(conversationId)
 export function addMessage(conversationId, role, content)
 export function touchConversation(id, updates = {})
+### frontend/src/api.js
+export async function listModels()
+export async function listConversations()
+export async function createConversation(model)
+export async function listMessages(conversationId)
+export function streamMessage(conversationId, content, model, { onDelta, onDone, onError })
+### frontend/src/components/Sidebar.jsx
+export default function Sidebar({ conversations, selectedId, onSelect, onNewChat })
