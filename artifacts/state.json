@@ -1,11 +1,11 @@
 {
  "phase": "build",
- "session_next": 6,
+ "session_next": 7,
  "sessions_total": 8,
  "fixing": false,
  "pending_need": [],
  "resume": null,
- "last_note": "session 5 done: frontend/src/components/ModelSwitcher.jsx, frontend/src/components/ChatWindow.jsx implemented per interfaces (both new files, not present in prior manifest).\nModelSwitcher loads models via listModels().then(setModels) on mount; no error handling beyond default fetch/json rejection (not specified in contract, consistent with session 4 api.js style).\nChatWindow message bubbles capped at max-w-[70%] with flex justify-end/justify-start wrappers for left/right alignment (not specified in contract - smallest reasonable UI choice); streaming bubble reuses assistant bubble styling.\nno changes made to backend/db.js, backend/groq.js, frontend/src/api.js, or frontend/src/components/Sidebar.jsx; all untouched this session.\nno contract contradictions found this session.",
+ "last_note": "session 6 done: backend/server.js, backend/package.json, backend/Dockerfile implemented per interfaces and CONTRACT.\nPOST /api/conversations and POST /api/conversations/:id/messages destructure req.body directly (no `|| {}` fallback) - not specified in contract, consistent with prior sessions' minimal-error-handling style; assumes frontend always sends Content-Type: application/json so express.json() populates req.body.\nno changes made to backend/db.js, backend/groq.js, or any frontend files; all untouched this session.\nno contract contradictions found this session.",
  "history": [
   {
    "s": 1,
@@ -46,6 +46,16 @@
    "files": [
     "frontend/src/components/ChatWindow.jsx",
     "frontend/src/components/ModelSwitcher.jsx"
+   ],
+   "del": []
+  },
+  {
+   "s": 6,
+   "utc": "2026-07-07T07:29:15",
+   "files": [
+    "backend/Dockerfile",
+    "backend/package.json",
+    "backend/server.js"
    ],
    "del": []
   }

@@ -15,3 +15,9 @@ ModelSwitcher loads models via listModels().then(setModels) on mount; no error h
 ChatWindow message bubbles capped at max-w-[70%] with flex justify-end/justify-start wrappers for left/right alignment (not specified in contract - smallest reasonable UI choice); streaming bubble reuses assistant bubble styling.
 no changes made to backend/db.js, backend/groq.js, frontend/src/api.js, or frontend/src/components/Sidebar.jsx; all untouched this session.
 no contract contradictions found this session.
+
+## session 6 (2026-07-07T07:29:15)
+session 6 done: backend/server.js, backend/package.json, backend/Dockerfile implemented per interfaces and CONTRACT.
+POST /api/conversations and POST /api/conversations/:id/messages destructure req.body directly (no `|| {}` fallback) - not specified in contract, consistent with prior sessions' minimal-error-handling style; assumes frontend always sends Content-Type: application/json so express.json() populates req.body.
+no changes made to backend/db.js, backend/groq.js, or any frontend files; all untouched this session.
+no contract contradictions found this session.
