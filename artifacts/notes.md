@@ -29,3 +29,11 @@ package.json adds "name" and "private" fields beyond the literal TASK shape - no
 docker-compose.yml env_file: .env is resolved relative to the compose file (repo root) per default docker compose behavior; no .env file created this session since GROQ_API_KEY is a secret the user must supply themselves (R4).
 no changes made to backend/*, frontend/src/api.js, or frontend/src/components/*; all untouched this session.
 no contract contradictions found this session.
+
+## session 8 (2026-07-07T07:33:24)
+session 8 done: tests/test_acceptance.js implemented per TASK and acceptance checklist (1:1 mapping, steps 1-8).
+assumes /api/models items expose an `id` field (matching GROQ_MODELS usage already relied on by frontend/src/components/ModelSwitcher.jsx and api.js) - not restated in this session's CONTRACT excerpt, smallest reasonable choice consistent with prior sessions.
+assertion failures are intentionally left uncaught so Node's default uncaught-exception handling sets a non-zero exit and prints the AssertionError (message + stack) as the FAIL summary, per TASK wording "let uncaught assertion errors propagate and set a non-zero exit naturally"; process.exit(0) is only called explicitly on full success, after printing a PASS line per step.
+health polling and SSE framing reuse the same 1s/60-try and '\n\n'/'data: ' conventions described in TASK/groq.js; malformed SSE event blocks are skipped rather than failing the test, matching session 4's documented streamMessage tolerance.
+no changes made to backend/*, frontend/*, docker-compose.yml, README.md, or seed.md; all untouched this session.
+no contract contradictions found this session.

@@ -20,6 +20,7 @@ frontend/src/main.jsx (6 lines, 160 B)
 frontend/src/components/ChatWindow.jsx (108 lines, 3041 B)
 frontend/src/components/ModelSwitcher.jsx (25 lines, 544 B)
 frontend/src/components/Sidebar.jsx (28 lines, 950 B)
+tests/test_acceptance.js (161 lines, 6994 B)
 
 ## interfaces
 ### backend/db.js
@@ -55,3 +56,8 @@ function handleSend()
 export default function ModelSwitcher({ model, onChange })
 ### frontend/src/components/Sidebar.jsx
 export default function Sidebar({ conversations, selectedId, onSelect, onNewChat })
+### tests/test_acceptance.js
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+async function waitForBackendHealth(label)
+async function waitForFrontend()
+async function readSseEvents(response)
