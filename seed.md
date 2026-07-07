@@ -9,7 +9,7 @@ the spec below — no prose, no markdown fences outside it.
 
 PAYLOAD SPEC v1 - your ENTIRE reply is one payload. No prose outside it.
 
-#%% begin session=<k> blocks=<n>     first line. n = number of blocks below.
+#%% begin session=<k>                first line.
 #%% file <relative/path>             create/replace whole file; content follows.
 #%% patch <relative/path>            edit an existing file with hunks:
 <<< find
@@ -23,10 +23,10 @@ new text
                                      it to you. A need payload must contain only
                                      need and note blocks - nothing else.
 #%% note                             free text: memo to the user / next session.
-#%% end blocks=<n>                   last line. n must match begin.
+#%% end                              last line.
 
 Rules
-- Verbs are only: file, patch, delete, need, note. blocks counts every block.
+- Verbs are only: file, patch, delete, need, note.
 - file content is written verbatim plus a trailing newline. patch hunk text is
   matched and inserted exactly as written (no newline added).
 - No content line may start with "#%%". To emit one literally write "#%%%" and
@@ -35,20 +35,20 @@ Rules
 - Never write secret values; reference environment variable NAMES only.
 - If your output is about to be cut off, stop cleanly at a block boundary; the
   runner will ask the next session to resume with:
-  #%% begin session=<k> blocks=<remaining> resume=<first missing block index>
+  #%% begin session=<k> resume=<first missing block index>
 
 ## YOUR TASK
 
 The user's project description is in this chat. Design the whole build and
 emit exactly one payload:
 
-    #%% begin session=1 blocks=1
+    #%% begin session=1
     #%% file artifacts/blueprint.md
     ...
-    #%% end blocks=1
+    #%% end
 
-(You may add one `#%% note` block — then blocks=2 — for anything the user must
-know, e.g. decisions you made where the description was silent.)
+(You may add one `#%% note` block for anything the user must know, e.g.
+decisions you made where the description was silent.)
 
 If the description is too thin to pin a tech contract, emit a payload with a
 single `#%% note` block containing your questions (numbered, ≤10 lines) and

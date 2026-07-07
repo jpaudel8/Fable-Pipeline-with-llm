@@ -63,7 +63,7 @@ python factory.py spec       print the canonical payload spec
 ## Safety model
 
 - **Two-phase apply.** Every payload is fully validated in memory first:
-  begin/end markers and block counts, path safety (project-root jail, `.git`
+  begin/end markers, path safety (project-root jail, `.git`
   and runner files protected), patch anchors unique, Python compiled, JSON
   parsed. Only then does anything touch disk — all-or-nothing.
 - **Git as the undo button.** Manual edits are auto-committed before each
@@ -165,7 +165,7 @@ llama-3.1-8b-instant for 14.4K/day if you ever hit limits).
 ```
 PAYLOAD SPEC v1 - your ENTIRE reply is one payload. No prose outside it.
 
-#%% begin session=<k> blocks=<n>     first line. n = number of blocks below.
+#%% begin session=<k>                first line.
 #%% file <relative/path>             create/replace whole file; content follows.
 #%% patch <relative/path>            edit an existing file with hunks:
 <<< find
@@ -179,10 +179,10 @@ new text
                                      it to you. A need payload must contain only
                                      need and note blocks - nothing else.
 #%% note                             free text: memo to the user / next session.
-#%% end blocks=<n>                   last line. n must match begin.
+#%% end                              last line.
 
 Rules
-- Verbs are only: file, patch, delete, need, note. blocks counts every block.
+- Verbs are only: file, patch, delete, need, note.
 - file content is written verbatim plus a trailing newline. patch hunk text is
   matched and inserted exactly as written (no newline added).
 - No content line may start with "#%%". To emit one literally write "#%%%" and
@@ -191,7 +191,7 @@ Rules
 - Never write secret values; reference environment variable NAMES only.
 - If your output is about to be cut off, stop cleanly at a block boundary; the
   runner will ask the next session to resume with:
-  #%% begin session=<k> blocks=<remaining> resume=<first missing block index>
+  #%% begin session=<k> resume=<first missing block index>
 ```
 
 ## Files at a glance
@@ -208,4 +208,3 @@ artifacts/request.md     you write feature requests / bug intent here
 artifacts/log.txt        last 200 runtime log lines (auto-captured)
 artifacts/notes.md       accumulated session memos
 ```
-Testing PR workflow from B

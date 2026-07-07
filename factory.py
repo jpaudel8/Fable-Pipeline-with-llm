@@ -70,7 +70,7 @@ artifacts/partial.json
 
 SPEC = """PAYLOAD SPEC v1 - your ENTIRE reply is one payload. No prose outside it.
 
-#%% begin session=<k> blocks=<n>     first line. n = number of blocks below.
+#%% begin session=<k>                first line.
 #%% file <relative/path>             create/replace whole file; content follows.
 #%% patch <relative/path>            edit an existing file with hunks:
 <<< find
@@ -84,10 +84,10 @@ new text
                                      it to you. A need payload must contain only
                                      need and note blocks - nothing else.
 #%% note                             free text: memo to the user / next session.
-#%% end blocks=<n>                   last line. n must match begin.
+#%% end                              last line.
 
 Rules
-- Verbs are only: file, patch, delete, need, note. blocks counts every block.
+- Verbs are only: file, patch, delete, need, note.
 - file content is written verbatim plus a trailing newline. patch hunk text is
   matched and inserted exactly as written (no newline added).
 - No content line may start with "#%%". To emit one literally write "#%%%" and
@@ -96,7 +96,7 @@ Rules
 - Never write secret values; reference environment variable NAMES only.
 - If your output is about to be cut off, stop cleanly at a block boundary; the
   runner will ask the next session to resume with:
-  #%% begin session=<k> blocks=<remaining> resume=<first missing block index>
+  #%% begin session=<k> resume=<first missing block index>
 """
 
 
@@ -274,9 +274,9 @@ def validate_plan(plan):
 
 # ------------------------------------------------------------ payload parser
 
-BEGIN_RE = re.compile(r"^#%% begin session=(\d+) blocks=(\d+)"
+BEGIN_RE = re.compile(r"^#%% begin session=(\d+)(?: blocks=(\d+))?"
                       r"(?: resume=(\d+))?\s*$")
-END_RE = re.compile(r"^#%% end blocks=(\d+)\s*$")
+END_RE = re.compile(r"^#%% end(?: blocks=(\d+))?\s*$")
 VERB_RE = re.compile(r"^#%% (file|patch|delete|need|note)(?:\s+(.*?))?\s*$")
 
 
@@ -294,9 +294,9 @@ def parse_payload(text):
             break
         i += 1
     if not begin:
-        raise ValueError("no '#%% begin session=<k> blocks=<n>' line found")
+        raise ValueError("no '#%% begin session=<k>' line found")
     session = int(begin.group(1))
-    declared = int(begin.group(2))
+    declared = int(begin.group(2)) if begin.group(2) else None
     resume = int(begin.group(3)) if begin.group(3) else None
     i += 1
 
@@ -306,7 +306,8 @@ def parse_payload(text):
         line = lines[i]
         em = END_RE.match(line)
         if em:
-            ended, end_n = True, int(em.group(1))
+            ended = True
+            end_n = int(em.group(1)) if em.group(1) else None
             break
         vm = VERB_RE.match(line)
         if vm:
@@ -676,8 +677,7 @@ def copilot(system, user, max_tokens=900):
 REPAIR_SYS = ("You repair ONLY the FORMATTING of a payload for a strict "
               "parser: fix or add marker lines (#%% begin/file/patch/delete/"
               "need/note/end and <<< find / === replace / >>> hunk markers), "
-              "correct block counts, strip surrounding prose or markdown "
-              "fences. NEVER alter, add, reorder or remove any content line "
+              "strip surrounding prose or markdown fences. NEVER alter, add, reorder or remove any content line "
               "(code, hunk text, note text). Output ONLY the corrected "
               "payload - no commentary, no fences.\nGrammar:\n" + SPEC)
 
@@ -716,8 +716,9 @@ def try_repair(text, err, state):
         pl = parse_payload(fixed)
     except ValueError:
         return None
-    if (not pl["ended"] or pl["resume"] or pl["end_n"] != pl["declared"]
-            or len(pl["blocks"]) != pl["declared"]
+    if (not pl["ended"] or pl["resume"]
+            or (pl["declared"] is not None
+                and len(pl["blocks"]) != pl["declared"])
             or pl["session"] != state.get("session_next")):
         return None
     soup = "\n".join(unescape(l) for l in text.splitlines())
@@ -789,7 +790,7 @@ R2 Honor the CONTRACT exactly: pinned versions, given interfaces, env names.
 R3 Only touch files in your task (or clearly implied helpers); use need/note
    for anything else. Patch find-text must be unique or resend the whole file.
 R4 Never output secret values.
-R5 First line: #%% begin session={k} blocks=<n>   Last line: #%% end blocks=<n>
+R5 First line: #%% begin session={k}   Last line: #%% end
 R6 If the contract contradicts existing code or itself: make the smallest
    literal fix, add a note line `flagged_correction: <what/why>`, continue -
    never redesign. Record any NEW fact later sessions must share as a note
@@ -970,7 +971,9 @@ def bundle_seed_retry(state, questions):
 
 def bundle_resume(state, plan):
     r = state["resume"]
-    k, got, total_blocks = r["session"], r["blocks_done"], r["declared"]
+    k, got = r["session"], r["blocks_done"]
+    total_blocks = r.get("declared")
+    left = f"{total_blocks - got} " if total_blocks else ""
     kind = ("maintain cycle" if state["phase"] == "maintain"
             else "build session")
     heads = "\n".join(f"  {i+1}. #%% {b['verb']} {b['arg']}".rstrip()
@@ -979,14 +982,14 @@ def bundle_resume(state, plan):
     return "\n".join([
         hdr(proj, kind + " (RESUME)", k, state.get("sessions_total")),
         f"## YOUR TASK - resume truncated payload for session {k}",
-        f"The previous reply was cut off. {got} of {total_blocks} blocks "
-        "arrived safely and are stored; do NOT repeat them:", heads or "  (none)",
+        f"The previous reply was cut off. {got} block(s) arrived safely "
+        "and are stored; do NOT repeat them:", heads or "  (none)",
         "",
-        f"Emit ONLY the remaining {total_blocks - got} block(s), starting the "
-        "payload with exactly:",
-        f"#%% begin session={k} blocks={total_blocks - got} resume={got + 1}",
+        f"Emit ONLY the remaining {left}block(s), starting the payload "
+        "with exactly:",
+        f"#%% begin session={k} resume={got + 1}",
         "and ending with:",
-        f"#%% end blocks={total_blocks - got}", "",
+        "#%% end", "",
         "The original task and contract follow for reference.", "",
         "## ORIGINAL TASK + CONTRACT", r.get("bundle", "(unavailable)")])
 
@@ -1281,14 +1284,6 @@ def cmd_apply(args):
             die(f"payload unreadable: {e}\nfix the paste and re-run apply")
         info("copilot repaired payload formatting (content verified "
              "unchanged)")
-    if (pl["ended"] and not pl["resume"] and not state.get("resume")
-            and (pl["end_n"] != pl["declared"]
-                 or len(pl["blocks"]) != pl["declared"])):
-        fixed = try_repair(text, "block count mismatch", state)
-        if fixed:
-            pl = fixed
-            info("copilot repaired payload block counts (content verified "
-                 "unchanged)")
 
     # ---- session / resume bookkeeping
     r = state.get("resume")
@@ -1314,15 +1309,23 @@ def cmd_apply(args):
                            if BUNDLE_F.exists() else ""}
         save_state(state)
         write_bundle(bundle_resume(state, plan))
-        info(f"payload truncated after block {len(got)}/{declared_total} - "
-             "stored safely.")
+        info(f"payload truncated after block {len(got)}"
+             + (f"/{declared_total}" if declared_total else "")
+             + " - stored safely.")
         info("NEXT: upload bundle.md to a fresh chat; it asks only for the "
              "remaining blocks.")
         return
-    if pl["end_n"] != pl["declared"] or len(blocks) != declared_total:
-        die(f"block count mismatch: begin={declared_total} "
-            f"end={pl['end_n']} received={len(blocks)} - ask the session to "
-            "resend (upload bundle.md again)")
+    ct = []
+    if (pl["end_n"] is not None and pl["declared"] is not None
+            and pl["end_n"] != pl["declared"]):
+        ct.append(f"begin says {pl['declared']}, end says {pl['end_n']}")
+    if declared_total is not None and len(blocks) != declared_total:
+        ct.append(f"declared {declared_total}, received {len(blocks)}")
+    if ct:
+        info("block-count note (" + "; ".join(ct) + ") - counts are "
+             "advisory; the end marker confirms the reply is complete, so "
+             "proceeding. If you suspect a partial copy-paste, re-paste "
+             "and re-run apply.")
     state["resume"] = None
 
     # ---- validate everything before touching disk
