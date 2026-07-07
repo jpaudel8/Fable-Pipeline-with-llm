@@ -1,17 +1,25 @@
 {
  "phase": "build",
- "session_next": 2,
+ "session_next": 3,
  "sessions_total": 8,
  "fixing": false,
  "pending_need": [],
  "resume": null,
- "last_note": "",
+ "last_note": "implemented backend/db.js per interfaces exactly: initDb, createConversation, listConversations, getConversation, listMessages, addMessage, touchConversation. All non-init exports throw via ensureInit() if called before initDb(). touchConversation always bumps updated_at and conditionally sets title/model in one UPDATE statement, values array order matches generated SET clause order plus trailing id for WHERE.",
  "history": [
   {
    "s": 1,
    "utc": "2026-07-07T07:21:27",
    "files": [
     "artifacts/blueprint.md"
+   ],
+   "del": []
+  },
+  {
+   "s": 2,
+   "utc": "2026-07-07T07:23:01",
+   "files": [
+    "backend/db.js"
    ],
    "del": []
   }
