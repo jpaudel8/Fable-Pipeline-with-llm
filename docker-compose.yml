@@ -1,0 +1,18 @@
+services:
+  backend:
+    build: ./backend
+    ports:
+      - '3001:3001'
+    env_file: .env
+    environment:
+      PORT: '3001'
+      DB_PATH: '/app/data/chat.db'
+      CORS_ORIGIN: 'http://localhost:5173'
+    volumes:
+      - ./backend/data:/app/data
+  frontend:
+    build: ./frontend
+    ports:
+      - '5173:5173'
+    depends_on:
+      - backend

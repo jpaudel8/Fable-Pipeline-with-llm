@@ -21,3 +21,11 @@ session 6 done: backend/server.js, backend/package.json, backend/Dockerfile impl
 POST /api/conversations and POST /api/conversations/:id/messages destructure req.body directly (no `|| {}` fallback) - not specified in contract, consistent with prior sessions' minimal-error-handling style; assumes frontend always sends Content-Type: application/json so express.json() populates req.body.
 no changes made to backend/db.js, backend/groq.js, or any frontend files; all untouched this session.
 no contract contradictions found this session.
+
+## session 7 (2026-07-07T07:30:39)
+session 7 done: frontend/src/App.jsx, frontend/src/main.jsx, frontend/src/index.css, frontend/index.html, frontend/vite.config.js, frontend/package.json, frontend/Dockerfile, docker-compose.yml implemented per TASK and CONTRACT.
+App.jsx loads conversations on mount via useEffect(() => { refreshConversations(); }, []) - not specified verbatim in TASK but required by "loaded on mount" wording; smallest reasonable choice, no eslint-disable added since not otherwise specified.
+package.json adds "name" and "private" fields beyond the literal TASK shape - not specified in contract, smallest reasonable choice for a valid installable package; all pinned dependency/devDependency versions taken verbatim from CONTRACT.
+docker-compose.yml env_file: .env is resolved relative to the compose file (repo root) per default docker compose behavior; no .env file created this session since GROQ_API_KEY is a secret the user must supply themselves (R4).
+no changes made to backend/*, frontend/src/api.js, or frontend/src/components/*; all untouched this session.
+no contract contradictions found this session.
